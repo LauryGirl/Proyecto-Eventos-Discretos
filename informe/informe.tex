@@ -1,0 +1,323 @@
+\documentclass{book}
+\usepackage{algpseudocode}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[colorlinks = true, linkcolor = magenta]{hyperref}
+\usepackage{graphicx}
+
+\begin{document}
+
+	\begin{titlepage}
+		\centering
+		{\bfseries\LARGE Universidad de La Habana \par }
+		\vspace{1cm}
+		{\scshape\LARGE Facultad de Matem\'atica y Computaci\'on \par}
+		\vspace{3cm}
+		{\scshape\Huge Proyecto de Simulaci\'on basado en Eventos Discretos \par}
+		\vspace{3cm}
+		\vfill
+		{\Large \underline{Estudiante:} \par}
+		{\Large Laura Brito Guerrero C-412 \par}
+		\vfill
+	\end{titlepage}
+	
+	\section{Orden del problema asignado: La cocina de Kojo (Kojo's Kitchen)}	
+	
+		La cocina de Kojo es uno de los puestos de comida r\'apida en un centro comercial. El centro comercial est\'a abierto entre las 10:00 am y las 9:00 pm cada d\'ia. En este lugar se sirven dos tipos de productos: s\'andwiches y suchi. Para los objetivos de este proyecto se asumir\'a que existen solo dos tipos de consumidores: unos consumen solo s\'andwiches y los otros consumen solo productos de la gama del suchi. En Kojo hay dos per\'iodos de hora pico durante un d\'ia de trabajo; uno entre las 11:30 am y la 1:30 pm, y el otro entre las 5:00 pm y las 7:00 pm. El intervalo de tiempo entre el arribo de un consumidor y el de otro no es homog\'eneo pero, por conveniencia, se asumir\'a que es homog\'eneo. El intervalo de tiempo de los segmentos homog\'eneos, distribuye de forma exponencial. \\
+		Actualmente dos empleados trabajan todo el d\'ia preparando s\'andwiches y suchi para los consumidores. El tiempo de preparaci\'on depende del producto en cuesti\'on. Estos distribuyen de forma uniforme, en un rango de 3 a 5 minutos para la preparaci\'on de s\'andwiches y entre 5 a 8 minutos para la preparaci\'on del suchi. \\
+		El administrador de Kojo est\'a muy feliz con el negocio, pero ha estado recibiendo quejas de los consumidores por la demora de sus peticiones. \'El est\'a interesado en explorar algunas opciones de distribuci\'on del personal para reducir el n\'umero de quejas. Su inter\'es est\'a centrado en comparar la situaci\'on actual con una opci\'on alternativa donde se emplea un tercer empleado durante los per\'iodos m\'as ocupados. La medida del desempe\~no de estas opciones estar\'a dada por el porciento de consumidores que espera m\'as de 5 minutos por un servicio durante el curso de un d\'ia de trabajo. \\
+		Se desea obtener el porciento de consumidores que esperan m\'as de 5 minutos cuando solo dos empleados est\'an trabajando y este mismo dato agregando un empleado en las horas picos.
+		
+	\section{Principales ideas seguidas para la soluci\'on del problema}
+	Primeramente para la soluci\'on de este problema se deben tener en cuenta que se quiere llegar a dos resultados, por lo tanto se deben dar respuestas a dos problem\'aticas y comparar sus resultados. La llegada de los clientes distribuye exponencial, como lo dice la orden, por lo tanto, se simulan en minutos la apertura de los mismos. Con respecto al tiempo, se convierte el horario en el cual se encuentra abierta la cocina en minutos para realizar el an\'alisis m\'as f\'acil de concebir, luego se convierte en la hora exacta donde ocurren las entradas y salidas de los clientes. Para cada soluci\'on nos auxiliamos de un diccionario (\textbf{time\underline{ }mean}) para guardar a los clientes que demoran m\'as de 5 minutos esperando su pedido, este dato se conoce ya que cada cliente tiene guardado su tiempo de llegada (\textbf{A}) y su tiempo de salida (\textbf{D}), por ejemplo, el cliente \textit{i} que pide s\'andwich (suchi) pertenece a \textbf{time\underline{ }mean} si y solo si \begin{equation}
+	D[i] - A[i] - 5 \geq 5  (D[i] - A[i] - 8 \geq 5).
+\end{equation} . \\
+	Una vez que la simulaci\'on termine, en \textbf{time\underline{ }mean} estar\'a el total de clientes que espera m\'as de 5 minutos, por lo tanto, con este dato y con el total de clientes que asiste a la cocina (\textbf{Na}) se calcula el porciento que representa. Se denota a la cantidad de clientes que est\'an en \textbf{time\underline{ }mean} como \textbf{x}, por lo tanto el porciento se calcula mediante la expresi\'on:
+	\begin{equation}
+		 \frac{100x}{Na} .
+	\end{equation}
+	Con respecto a las horas picos, se define para la hora de llegada del pr\'oximo cliente (\textbf{ta}) otra distribuci\'on exponencial con 
+	\begin{equation}
+		\lambda = \frac{1}{5},
+	\end{equation}		
+	 y las restantes horas se definen con la distribuci\'on exponencial siendo
+	\begin{equation}
+		\lambda = \frac{1}{60}.
+	\end{equation}		 
+	  
+	A continuaci\'on se muestra las ideas a seguir para cada problema en cuesti\'on.
+	\begin{enumerate}
+		\item \textbf{Cuando en la cocina solo atienden dos empleados:} 
+			\begin{enumerate}
+				\item Como cada empleado se dedica a un tipo de elaboraci\'on espec\'ifica: s\'andwich o suchi, se analizan por separado, ya que la actividad de uno no interfiere en el otro, por ello se tendr\'an dos colecciones de datos (\textbf{Na\underline{ }1} para el s\'andwich y \textbf{Na\underline{ }2} para el suchi) para guardar a los clientes que les interesa cada elaboraci\'on y est\'an en la cola esperando por su pedido. 
+				\item Se guardan en dos variables (\textbf{t1} para el s\'andwich y \textbf{t2} para el suchi) el tiempo de la partida de los clientes, cada momento siendo consecuente con el tiempo que termina el empleado de cada elaboraci\'on de terminar un pedido. \textbf{t1} distribuye uniforme de 3 a 5 minutos y \textbf{t2} tambi\'en distribuye uniforme de 5 a 8 minutos.
+			\end{enumerate}
+		\item \textbf{Cuando se emplea un tercer empleado en los horarios picos}
+			\begin{enumerate}
+				\item El razonamiento se mantiene an\'alogo al anterior problema con la distinci\'on de que en los horarios picos var\'ia su razonamiento. Se sigue el siguiente planteamiento: 
+				\begin{enumerate}
+					\item En los horarios picos, al llegar un cliente que elige la elaboraci\'on i (i = s\'andwich, suchi), si el empleado encargado de la elaboraci\'on i est\'a ocupado entonces el nuevo empleado se encarga del pedido si \'el est\'a desocupado,
+					\item de lo contrario el cliente espera en la misma cola que todos los dem\'as clientes y espera a ser atendido cuando le toque el turno,
+					\item cuando le toque el turno analizar si el empleado encargado de la elaboraci\'on i est\'a desocupado, de ser cierto es atendido por el mismo, si no, analiza si el nuevo empleado est\'a disponible, si se cumple es atendido por \'el, de lo contrario sigue pendiente el cliente en la cola hasta que se libere el primero de los empleados mencionados.
+				\end{enumerate}		
+				\item Se guardan en tres variables (\textbf{t1} para el s\'andwich, \textbf{t2} para el suchi y \textbf{t3} para el nuevo empleado que realiza tanto s\'andwich como suchi) el tiempo de la partida de los clientes, cada momento siendo consecuente con el tiempo que termina el empleado de cada elaboraci\'on de terminar un pedido. \textbf{t1} distribuye uniforme de 3 a 5 minutos, \textbf{t2} tambi\'en distribuye uniforme de 5 a 8 minutos y \textbf{t3} distribuye depende del pedido que est\'e elaborando.		
+			\end{enumerate}
+	\end{enumerate}
+	En el pr\'oximo ep\'igrafe se explica en base del pseudoc\'odigo implementado la simulaci\'on utilizada en cada caso.
+	
+	\section{Modelo de Simulaci\'on de Eventos Discretos desarrollado para resolver el problema}
+	Cada problem\'atica se resuelve mediante la implementaci\'on de simulaci\'on basada en eventos discretos. Se describe cada uno por separado y se explica el sistema utilizado en cuesti\'on.
+		\subsection{Cuando en la cocina solo atienden dos empleados}
+			Se implementa un sistema de atenci\'on de dos servidores. Existen dos servidores (el servidor del s\'andwich y el del suchi), y una vez que llega un cliente es atendido por el servidor correspondiente, si est\'a vac\'io sino espero su turno en la cola correspondiente. Cuando alguno de los servidores termina de atender a un cliente comienza inmediatamente a atender el cliente que lleva m\'as tiempo esperando en la cola de su servicio. \\
+			Existe un tiempo fijo \textbf{T} = 660 minutos, que equivale a las 11 horas que se encuentra abierto el puesto de comida, a partir del cual no se le permite entrar a m\'as ning\'un cliente al sistema, sin embargo todos los clientes que ya estaban dentro deber\'an ser atendidos. \\
+			
+			Las variables del sistema son:
+			\begin{enumerate}
+				\item t: variable del tiempo transcurrido,
+				\item Na: la cantidad de arribos en el sistema,
+				\item Nd: la cantidad de partidas en el sistema,
+				\item Na\underline{ }1: clientes en la cola para el servicio del s\'andwich,
+				\item Na\underline{ }2: clientes en la cola para el servicio del suchi,
+				\item n: cantidad de clientes en el sistema
+				\item A: A[i] es el tiempo de llegada del cliente i,
+				\item D: D[i] es el tiempo de partida del cliente i,
+				\item S: S[i] es el servicio que escoge el cliente i (Si S[i] = 1 entonces el cliente i quiere s\'andwich, si S[i] = 2 el cliente i quiere suchi),
+				\item Tp: tiempo que atiende el sistema luego de cerrar,
+				\item ta: tiempo del pr\'oximo arribo de un cliente,
+				\item t1: tiempo de la pr\'oxima partida del servicio del s\'andwich,
+				\item t2: tiempo de la pr\'oxima partida del servicio del suchi.
+			\end{enumerate}
+			El \textbf{pseudoc\'odigo} de la l\'ogica implementada es el siguiente:\\ \\
+			
+			\underline{\textbf{Inicializaci\'on}}
+			\begin{algorithmic}
+				\State{t = Na = Nd = n = Tp = 0}
+				\State{Na\underline{ }1 = Na\underline{ }2 = []}
+				\State{A = D = S = \{\}}
+				\State{t1 = t2 = $\infty$}
+				\State{ta = generar variable con distribuci\'on exponencial}
+			\end{algorithmic}
+			
+			\underline{ \textbf{Caso 1: arriba un nuevo cliente}}\\
+			\begin{algorithmic}
+				\If{ ta = min(ta, t1, t2) y ta $\leq$ T - 1}
+					\State{t = ta}
+					\State{n++, Na++}
+					\If{es hora pico}
+						\State{Tt = generar variable con distribuci\'on exponencial con lambda=1/5}
+					\Else
+						\State{Tt = generar variable con distribuci\'on exponencial con lambda=1/60}
+					\EndIf
+					\State{ta = t + Tt}
+					\State{A[Na] = t}
+					\State{select = choice([1, 2])}		
+					\State{S[Na] = select}	
+					\If{select = 1}
+						\If{Na\underline{ }1 no tiene elementos}
+							\State{Y1 = generar variable uniforme de 3 a 5 minutos}
+							\State{t1 = t + Y1}
+						\EndIf
+						\State{agrega el cliente Na a Na\underline{ }1}		
+					\Else
+						\If{Na\underline{ }2 no tiene elementos}
+							\State{Y2 = generar variable uniforme de 5 a 8 minutos}
+							\State{t2 = t + Y2}
+						\EndIf
+						\State{agrega el cliente Na a Na\underline{ }2}
+					\EndIf		
+
+				\EndIf
+			\end{algorithmic}
+
+			\underline{ \textbf{Caso 2: se va un cliente con su pedido de sandwich(i = 1) o suchi(i = 2)}}\\
+			\begin{algorithmic}
+				\If{ ti = min(ta, t1, t2) y ti $\leq$ T - 1, para i = 1,2}
+					\If{n $\geq$ 1 y Na\underline{ }i no esta vacio}
+						\State{t = ti}
+						\State{n--, Nd++}
+						\State{N = Na\underline{ }i[0]}
+						\State{eliminar N de Na\underline{ }i}
+						\State{D[N] = t}
+						\If{D[N] - A[N] - 5 $\geq$ 5 si i = 1, D[N] - A[N] - 8 $\geq$ 5 si i = 2}
+							\State{time\underline{ }mean[N] = D[N] - A[N] - 5 si i = 1, D[N] - A[N] - 8 si i = 2}
+						\EndIf
+						\If{Na\underline{ }i esta vacio}
+							\State{ti = $\infty$}
+						\Else
+							\State{Yi = generar variable uniforme correspondiente}
+							\State{ti = t + Yi}
+						\EndIf													
+					\Else
+						\State{ti = $\infty$}
+					\EndIf
+				\EndIf
+			\end{algorithmic}
+
+			\underline{ \textbf{Caso 3: Restaurante cerrado y se va un cliente con su pedido de sandwich(i = 1)}}
+			\ \ \underline{\textbf{ o suchi(i = 2)}}
+			\begin{algorithmic}
+				\If{ ti = min(ta, t1, t2) $\geq$ T y Na\underline{ }i no esta vacio, para i = 1,2}
+					\State{t = ti}
+					\State{n--, Nd++}
+					\State{N = Na\underline{ }i[0]}
+					\State{eliminar N de Na\underline{ }i}
+					\State{D[N] = t}
+					\If{D[N] - A[N] - 5 $\geq$ 5 si i = 1, D[N] - A[N] - 8 $\geq$ 5 si i = 2}
+						\State{time\underline{ }mean[N] = D[N] - A[N] - 5 si i = 1, D[N] - A[N] - 8 si i = 2}
+					\EndIf
+					\If{Na\underline{ }i esta vacio}
+						\State{ti = $\infty$}
+					\Else
+						\State{Yi = generar variable uniforme correspondiente}
+						\State{ti = t + Yi}
+					\EndIf													
+				\EndIf
+			\end{algorithmic}
+
+			\underline{ \textbf{Caso 4: Restaurante cerrado y ya no quedan clientes por atender}}
+			\begin{algorithmic}
+				\If{ min(ta, t1, t2) $\geq$ T y n = 0}
+					\State{Tp = max(t - T, 0)}
+					\State{BREAK}
+				\EndIf
+			\end{algorithmic}
+
+			
+			La soluci\'on se localiza en la direcci\'on del proyecto \textit{ code/src/kojo\underline{ }kitchen\underline{ }1.py}. Para poder observar la simulaci\'on descomente los \textbf{print()} del c\'odigo.
+		
+		\subsection{Cuando se emplea un tercer empleado en los horarios picos}
+			Se implementa un sistema de atenci\'on con dos servidores en paralelo, donde el primer servidor funciona como un servidor de dos servidores independientes. Cuando un cliente llega este es atendido por el servidor que se encuentre vac\'io y si los dos est\'an llenos entonces espera en la cola. Se denomina que el primer servidor est\'a vac\'io para el cliente \textit{i} que pide la elaboraci\'on \textit{j} si el subservidor que elabora el pedido \textit{j} est\'a vac\'io. Se dice que el segundo servidor est\'a vac\'io cuando el tiempo de arribo del cliente \textit{i} se encuentra comprendido en el horario pico. \\
+			Las variables del sistema son:
+			\begin{enumerate}
+				\item t: variable del tiempo transcurrido,
+				\item SS: variable de estado del sistema,
+				\item Na: la cantidad de arribos en el sistema,
+				\item Ci: la cantidad de partidas en el sistema por el servidor i, i = 1, 2, 3 (para i = 1, 2 se refiere al mismo servidor lo que se diferencian en el mismo los servicios prestados, i = 1 para el s\'andwich e i = 2 para el suchi),
+				\item A: A[i] es el tiempo de llegada del cliente i,
+				\item D: D[i] es el tiempo de partida del cliente i,
+				\item S: S[i] es el servicio que escoge el cliente i (Si S[i] = 1 entonces el cliente i quiere s\'andwich, si S[i] = 2 el cliente i quiere suchi),
+				\item ta: tiempo del pr\'oximo arribo de un cliente,
+				\item t1: tiempo de la pr\'oxima partida del servicio del s\'andwich para el servidor 1,
+				\item t2: tiempo de la pr\'oxima partida del servicio del suchi para el servidor 1,
+				\item t3: tiempo de la pr\'oxima partida del servicio del s\'andwich o suchi para el servidor 2.
+			\end{enumerate}
+			
+			Para mayor visualizaci\'on se muestra el pseudoc\'odigo.
+			\underline{\textbf{Inicializaci\'on}}
+			\begin{algorithmic}
+				\State{t = Na = C1 = C2 = C3 = 0}
+				\State{SS = [0]}
+				\State{A = D = S = \{\}}
+				\State{t1 = t2 = t3 = $\infty$}
+				\State{ta = generar variable con distribuci\'on exponencial}
+			\end{algorithmic}
+			
+			\underline{ \textbf{Caso 1: arriba un nuevo cliente}}\\
+			\begin{algorithmic}
+				\If{ ta = min(ta, t1, t2, t3) y ta $\leq$ T - 1}
+					\State{t = ta}
+					\State{Na++}
+					\If{es hora pico}
+						\State{Tt = generar variable con distribuci\'on exponencial con lambda=1/5}
+					\Else
+						\State{Tt = generar variable con distribuci\'on exponencial con lambda=1/60}
+					\EndIf
+					\State{ta = t + Tt}
+					\State{A[Na] = t}
+					\State{select = choice([1, 2])}		
+					\State{S[Na] = select}	
+					\If{SS = [0]}
+						\If{select = 1}
+							\State{SS = [1, Na, 0, 0]}
+							\State{Y1 = generar variable uniforme de 3 a 5 minutos}
+							\State{t1 = t + Y1}
+						\Else
+							\State{SS = [1, 0, Na, 0]}
+							\State{Y2 = generar variable uniforme de 5 a 8 minutos}
+							\State{t2 = t + Y2}
+						\EndIf
+					\ElsIf{select = 1 y SS = [n, 0, i2, i3]}
+							\State{SS = [n + 1, Na, i2, i3]}
+							\State{Y1 = generar variable uniforme de 3 a 5 minutos}
+							\State{t1 = t + Y1}
+					\ElsIf{select = 2 y SS = [n, i1, 0, i3]}
+							\State{SS = [n + 1, i1, Na, i3]}
+							\State{Y2 = generar variable uniforme de 5 a 8 minutos}
+							\State{t2 = t + Y2}
+					\ElsIf{es hora pico y SS = [n, i1, i2, 0]}
+							\State{SS = [n + 1, i1, i2, i3]}
+							\State{Yi = generar variable uniforme correspondiente}
+							\State{t3 = t + Yi}
+					\ElsIf{SS = [n, i1, i2, i3, i4, . . . , in]}
+							\State{SS = [n + 1, i1, i2, i3, i4, . . ., in, Na]}
+					\EndIf		
+
+				\EndIf
+			\end{algorithmic}
+
+			\underline{ \textbf{Caso 2: se va un cliente con su pedido de sandwich(i = 1) o suchi(i = 2) del servidor 1}}\\
+			\begin{algorithmic}
+				\If{ ti = min(ta, t1, t2, t3) y ti $\leq$ T - 1, para i = 1,2}
+					\State{t = ti}
+					\State{Ci++}
+					\State{N = SS[i]}
+					\State{D[N] = t}
+					\If{D[N] - A[N] - 5 $\geq$ 5 si i = 1, D[N] - A[N] - 8 $\geq$ 5 si i = 2}
+						\State{time\underline{ }mean[N] = D[N] - A[N] - 5 si i = 1, D[N] - A[N] - 8 si i = 2}
+					\EndIf
+					\If{SS = [1, i1, 0, 0] si i = 1, SS = [1, 0, i2, 0] si i = 2}
+						\State{SS = [0]}
+						\State{ti = $\infty$}
+					\ElsIf{SS = [n, i1, i2, i3]}
+						\State{SS = [n - 1, 0, i2, i3] si i = 1, SS = [n - 1, i1, 0, i3] si i = 2}
+						\State{ti = $\infty$}
+					\Else
+						\State{ik = cliente que lleva mas tiempo en la cola esperando por pedir sandwich(i = 1), o suchi(i = 2)}
+						\State{SS = [n - 1, ik, i2, i3, i4, . . . , i(n-1)] para i = 1, SS = [n - 1, i1, ik, i3, i4, . . . , i(n-1)] para i = 2}
+						\State{Yi = generar variable uniforme correspondiente para servicio i}
+						\State{ti = t + Yi}
+					\EndIf
+				\EndIf
+			\end{algorithmic}
+
+			\underline{ \textbf{Caso 3: se va un cliente con su pedido de sandwich o suchi del servidor 2}}\\
+			\begin{algorithmic}
+				\If{ t3 = min(ta, t1, t2, t3) y t3 $\leq$ T - 1}
+					\State{t = t3}
+					\State{C3++}
+					\State{N = SS[3]}
+					\State{D[N] = t}
+					\If{D[N] - A[N] - 5 $\geq$ 5 si S[N] = 1, D[N] - A[N] - 8 $\geq$ 5 si S[N] = 2}
+						\State{time\underline{ }mean[N] = D[N] - A[N] - 5 si S[N] = 1, D[N] - A[N] - 8 si S[N] = 2}
+					\EndIf
+					\If{SS = [1, 0, 0, i3]}
+						\State{SS = [0]}
+						\State{t3 = $\infty$}
+					\ElsIf{SS = [n, i1, i2, i3]}
+						\State{SS = [n - 1, i1, i2, 0]}
+						\State{t3 = $\infty$}
+					\Else
+						\State{SS = [n - 1, i1, i2, i4, i5, . . . , i(n-1)]}
+						\State{Yi = generar variable uniforme correspondiente de S[i4]}
+						\State{t3 = t + Yi}
+					\EndIf
+				\EndIf
+			\end{algorithmic}
+			\underline{ \textbf{Caso 4: Restaurante cerrado y ya no quedan clientes por atender}}
+			\begin{algorithmic}
+				\If{ min(ta, t1, t2, t3) $\geq$ T y SS = [0]}
+					\State{BREAK}
+				\EndIf
+			\end{algorithmic}
+
+			
+			La soluci\'on se localiza en la direcci\'on del proyecto \textit{ code/src/kojo\underline{ }kitchen\underline{ }opt.py}. Para poder observar la simulaci\'on descomente los \textbf{print()} del c\'odigo.
+
+	\section{Consideraciones obtenidas a partir de la ejecuci\'on de las simulaciones del problema}
+	
+		A partir de la simulaci\'on de estas situaciones se evidencia que el promedio de los clientes que esperan m\'as de 5 minutos por su pedido es superior cuando solo hay dos empleados trabajando, sin embargo cuando existe otro empleado esta espera es pr\'acticamente nula en la mayor\'ia de los casos. \\
+		La implementaci\'on de la generaci\'on de las variables aleatorias se encuentran en \textit{code/src/utils/random\underline{ }var\underline{ }generation.py}. \\
+		La ejecuci\'on de todo el programa y la comparaci\'on de los dos m\'etodos est\'a en \textit{code/src/main.py}.	
+		
+		
+\end{document}
